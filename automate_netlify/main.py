@@ -10,6 +10,7 @@ import  random
 
 driver = webdriver.Chrome()
 driver.get("https://trytestingthis.netlify.app/index.html")
+driver.maximize_window()
 
 time.sleep(2)
 
