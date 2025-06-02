@@ -178,20 +178,20 @@ for r in range(2,len(rows)+1):
         data = driver.find_element(By.XPATH,"//table[@name='BookTable']/tbody/tr["+str(r)+"]/td["+str(c)+"]")
         print(data.text,end=' | ')
     print()
-
-#dynamic webtable
-rows = driver.find_elements(By.XPATH,"//table[@name='taskTable']/tbody/tr")
-print("No. of rows -> ",len(rows))
-
-cols = driver.find_elements(By.XPATH,"//table[@name='taskTable']/tbody/tr/th")
-print("No of cols -> ",len(cols))
-
-#read all data from table
-for r in range(2,len(rows)+1):
-    for c in range(1,len(cols)+1):
-        data = driver.find_element(By.XPATH,"//table[@name='taskTable']/tbody/tr["+str(r)+"]/td["+str(c)+"]")
-        print(data.text,end=' | ')
-    print()
+#
+# dynamic webtable
+# rows = driver.find_elements(By.XPATH,"//table[@name='taskTable']/tbody/tr")
+# print("No. of rows -> ",len(rows))
+#
+# cols = driver.find_elements(By.XPATH,"//table[@name='taskTable']/tbody/tr/th")
+# print("No of cols -> ",len(cols))
+#
+# #read all data from table
+# for r in range(2,len(rows)+1):
+#     for c in range(1,len(cols)+1):
+#         data = driver.find_element(By.XPATH,"//table[@name='taskTable']/tbody/tr["+str(r)+"]/td["+str(c)+"]")
+#         print(data.text,end=' | ')
+#     print()
 
 
 
