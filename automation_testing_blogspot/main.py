@@ -1,5 +1,7 @@
 from selenium import webdriver
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
+import requests as requests
 import time
 from selenium.webdriver.support.ui import Select
 from utils import fill_input, click_element, click_checkboxes, select_from_dropdown
@@ -89,8 +91,111 @@ for path in file_paths:
 driver.find_element(By.XPATH,'//*[@id="multipleFilesForm"]/button').click()
 
 
+#Alerts
+driver.find_element(By.XPATH,'//*[@id="alertBtn"]').click()
+alert_window =driver.switch_to.alert
+alert_window.accept()
+time.sleep(4)
 
-time.sleep(5)
+driver.find_element(By.XPATH,'//*[@id="confirmBtn"]').click()
+confirmation_alert = driver.switch_to.alert
+confirmation_alert.dismiss()
+
+driver.find_element(By.XPATH,'//*[@id="promptBtn"]').click()
+promt_alert = driver.switch_to.alert
+promt_alert.send_keys("Aniket")
+promt_alert.accept()
+
+#mouse hover
+point_me = driver.find_element(By.XPATH,'//*[@id="HTML3"]/div[1]/div/button')
+act = ActionChains(driver)
+act.move_to_element(point_me).perform()
+time.sleep(4)
+
+#doublr_click
+fill_input(driver,'field1',"Hello There!!")
+double_click = driver.find_element(By.XPATH,'//*[@id="HTML10"]/div[1]/button')
+act.double_click(double_click).perform()
+time.sleep(4)
+
+#Drag and Drop
+drag_ele = driver.find_element(By.XPATH,'//*[@id="draggable"]')
+drop_ele = driver.find_element(By.XPATH,'//*[@id="droppable"]')
+act.drag_and_drop(drag_ele,drop_ele).perform()
+time.sleep(4)
+
+#slider
+min_slider = driver.find_element(By.XPATH,'//*[@id="slider-range"]/span[1]') #{'x': 975, 'y': 2047}
+max_slider = driver.find_element(By.XPATH,'//*[@id="slider-range"]/span[2]') #{'x': 1105, 'y': 2047}
+print(min_slider.location ,'\n', max_slider.location)
+
+act.drag_and_drop_by_offset(min_slider,25,0).perform()
+act.drag_and_drop_by_offset(max_slider,95,0).perform()
+print(min_slider.location ,'\n', max_slider.location)
+
+#scrolling dropdown
+driver.find_element(By.ID,'comboBox').click()
+container =  driver.find_element(By.ID,'dropdown')
+target = 'Item 38'
+options = driver.find_elements(By.XPATH,"//div[@class='option']")
+found =  False
+for option in options:
+    driver.execute_script("arguments[0].scrollIntoView();", option)
+    if option.text.strip() == target:
+        option.click()
+        found = True
+        break
+time.sleep(4)
+
+#Handle Links
+all_links = driver.find_elements(By.XPATH,"//a[@class='link']")
+count = 0
+
+for link in all_links:
+    url = link.get_attribute('href')
+    try:
+        res = requests.head(url)
+    except:
+        None
+    if res.status_code>=400:
+        print(url, " is broken link")
+        count+=1
+    else:
+        print(url, " is valid link")
+
+print("total no of broken links:",count)
+
+#static table
+rows = driver.find_elements(By.XPATH,"//table[@name='BookTable']/tbody/tr")
+print("No. of rows -> ",len(rows))
+
+cols = driver.find_elements(By.XPATH,"//table[@name='BookTable']/tbody/tr/th")
+print("No of cols -> ",len(cols))
+
+#read all data from table
+for r in range(2,len(rows)+1):
+    for c in range(1,len(cols)+1):
+        data = driver.find_element(By.XPATH,"//table[@name='BookTable']/tbody/tr["+str(r)+"]/td["+str(c)+"]")
+        print(data.text,end=' | ')
+    print()
+
+#dynamic webtable
+rows = driver.find_elements(By.XPATH,"//table[@name='taskTable']/tbody/tr")
+print("No. of rows -> ",len(rows))
+
+cols = driver.find_elements(By.XPATH,"//table[@name='taskTable']/tbody/tr/th")
+print("No of cols -> ",len(cols))
+
+#read all data from table
+for r in range(2,len(rows)+1):
+    for c in range(1,len(cols)+1):
+        data = driver.find_element(By.XPATH,"//table[@name='taskTable']/tbody/tr["+str(r)+"]/td["+str(c)+"]")
+        print(data.text,end=' | ')
+    print()
+
+
+
+
 
 
 
