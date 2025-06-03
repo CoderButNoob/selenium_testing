@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import requests as requests
 import time
 from selenium.webdriver.support.ui import Select
@@ -106,6 +108,33 @@ promt_alert = driver.switch_to.alert
 promt_alert.send_keys("Aniket")
 promt_alert.accept()
 
+#new tab
+original_window = driver.current_window_handle
+driver.find_element(By.XPATH,'//*[@id="HTML4"]/div[1]/button').click()
+time.sleep(2)
+all_windows = driver.window_handles
+for window in all_windows:
+    if window != original_window:
+        driver.switch_to.window(window)
+        break
+print("Current Tab Title:", driver.title)
+driver.switch_to.window(original_window) #move back to orignal tab
+
+#pop-up window
+main_window = driver.current_window_handle
+driver.find_element(By.XPATH,'//*[@id="PopUp"]').click()
+time.sleep(2)
+all_windows = driver.window_handles
+for handle in all_windows:
+    if handle != main_window:
+        driver.switch_to.window(handle)
+        break
+print("Popup Title:", driver.title)
+driver.close()
+driver.switch_to.window(main_window)
+print("Back to Main Window:", driver.title)
+
+
 #mouse hover
 point_me = driver.find_element(By.XPATH,'//*[@id="HTML3"]/div[1]/div/button')
 act = ActionChains(driver)
@@ -179,24 +208,76 @@ for r in range(2,len(rows)+1):
         print(data.text,end=' | ')
     print()
 #
-# dynamic webtable
-# rows = driver.find_elements(By.XPATH,"//table[@name='taskTable']/tbody/tr")
-# print("No. of rows -> ",len(rows))
+# Dynamic Table
+wait = WebDriverWait(driver, 10, poll_frequency=2 , ignored_exceptions=[Exception])
+
+headers = wait.until(EC.presence_of_all_elements_located(
+    (By.XPATH, "//table[@id='taskTable']/thead/tr/th")))
+header_text = [h.text for h in headers]
+print("{:<20} {:<10} {:<15} {:<15} {:<15}".format(*header_text))
+print("-" * 80)
+
+# Get all table rows (not just cells)
+rows = wait.until(EC.presence_of_all_elements_located(
+    (By.XPATH, "//table[@id='taskTable']/tbody/tr")))
+
+# Loop through each row and print the columns
+for row in rows:
+    cols = row.find_elements(By.TAG_NAME, "td")
+    data = [col.text for col in cols]
+    print("{:<20} {:<10} {:<15} {:<15} {:<15}".format(*data))
+
+
+#Pagination Web Table
+# total_rows = 0
+# total_cols = 0
+# page = 1
+# pagination_links = driver.find_elements(By.XPATH, "//a[@href='#']")
 #
-# cols = driver.find_elements(By.XPATH,"//table[@name='taskTable']/tbody/tr/th")
-# print("No of cols -> ",len(cols))
+# total_pages = len(pagination_links)
+# print(f"Total Pages Found: {total_pages}")
+# while True:
+#     print(f"\n Page {page}")
 #
-# #read all data from table
-# for r in range(2,len(rows)+1):
-#     for c in range(1,len(cols)+1):
-#         data = driver.find_element(By.XPATH,"//table[@name='taskTable']/tbody/tr["+str(r)+"]/td["+str(c)+"]")
-#         print(data.text,end=' | ')
-#     print()
+#     #click all checkboxes
+#     checkboxes = driver.find_elements(By.XPATH,"//table[@id='productTable']/tbody/tr/td[4]/input[@type='checkbox']")
+#     for checkbox in checkboxes:
+#         if not checkbox.is_selected():
+#             checkbox.click()
 
+total_pages = len(driver.find_elements(By.XPATH, "//ul[@class='pagination']/li"))
 
+for page in range(1, total_pages + 1):
+    # Wait and get all checkboxes on current page
+    checkboxes = wait.until(
+        EC.presence_of_all_elements_located(
+            (By.XPATH, "//table[@id='productTable']/tbody/tr/td/input[@type='checkbox']"))
+    )
 
+    # Click only if not already selected
+    for checkbox in checkboxes:
+        if not checkbox.is_selected():
+            checkbox.click()
 
+    # Move to next page if not the last one
+    if page < total_pages:
+        next_page = driver.find_element(By.XPATH, f"//ul[@class='pagination']/li[{page + 1}]/a")
+        next_page.click()
+        time.sleep(1)
 
+# Shadow DOM
+shadow_host = driver.find_element(By.ID, "shadow_host")
+shadow_root = shadow_host.shadow_root
 
+input1 = shadow_root.find_element(By.CSS_SELECTOR, "input[type='text']").send_keys("Aniket")
+input2 = shadow_root.find_element(By.CSS_SELECTOR, "input[type='checkbox']")
+input2.click()
+input3 = shadow_root.find_element(By.CSS_SELECTOR, "input[type='file']").send_keys(
+    r"C:\Users\anike\Downloads\Ge_intro.docx"
+)
 
+blog_link = shadow_root.find_element(By.CSS_SELECTOR, "a[href='https://www.pavantestingtools.com/']")
+driver.execute_script("arguments[0].click();", blog_link)
+
+driver.back()
 driver.quit()
