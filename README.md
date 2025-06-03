@@ -1,6 +1,6 @@
 ﻿# Selenium Automation Project
 
-This project demonstrates an end-to-end automation of various UI components using **Selenium with Python** on the [Test Automation Practice Blogspot](https://testautomationpractice.blogspot.com/).
+This project demonstrates an end-to-end automation of various UI components using **Selenium with Python**.
 
 ## 📦 Features Covered
 
